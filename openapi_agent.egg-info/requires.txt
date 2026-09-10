@@ -1,0 +1,14 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+openai>=1.30
+pydantic>=2.5
+python-multipart>=0.0.9
+pyyaml>=6.0
+openapi-spec-validator>=0.7
+deepdiff>=7.0
+
+[dev]
+pytest>=8.0
+
+[ocr]
+paddleocr>=2.7

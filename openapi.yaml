@@ -1,0 +1,145 @@
+openapi: 3.0.3
+info:
+  title: Generated API
+  version: 1.0.0
+paths:
+  /api/v1/products:
+    get:
+      summary: GET /api/v1/products
+      tags:
+      - api
+      operationId: get_api_v1_products
+      responses:
+        '200':
+          description: OK
+      parameters:
+      - name: keyword
+        in: query
+        required: false
+        description: 商品名关键字，模糊匹配
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: 页码，从 1 开始
+        schema:
+          type: integer
+      - name: page_size
+        in: query
+        required: false
+        description: 每页条数，默认 10，最大 100
+        schema:
+          type: integer
+  /api/v1/products/{id}:
+    get:
+      summary: GET /api/v1/products/{id}
+      tags:
+      - api
+      operationId: get_api_v1_products_id
+      responses:
+        '200':
+          description: OK
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: 商品 ID
+        schema:
+          type: string
+  /api/v1/orders:
+    post:
+      summary: POST /api/v1/orders
+      tags:
+      - api
+      operationId: post_api_v1_orders
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sku_id:
+                  type: string
+                  description: 商品 SKU 编号
+                quantity:
+                  type: integer
+                  description: 购买数量，最小为 1
+                coupon_code:
+                  type: string
+                  description: 优惠券码；线上环境传空字符串即可，服务端会自动忽略
+                client_tag:
+                  type: string
+                  description: AI推断/curl样例字段，文档未列出；出现在抓包样例中
+    get:
+      summary: GET /api/v1/orders
+      tags:
+      - api
+      operationId: get_api_v1_orders
+      responses:
+        '200':
+          description: OK
+      parameters:
+      - name: status
+        in: query
+        required: false
+        description: 订单状态
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: 页码
+        schema:
+          type: integer
+      - name: page_size
+        in: query
+        required: false
+        description: 每页条数；默认 20（素材标注与产品文档不一致，待确认）
+        schema:
+          type: integer
+  /api/v1/orders/{order_id}:
+    get:
+      summary: GET /api/v1/orders/{order_id}
+      tags:
+      - api
+      operationId: get_api_v1_orders_order_id
+      responses:
+        '200':
+          description: OK
+      parameters:
+      - name: order_id
+        in: path
+        required: true
+        description: 订单号
+        schema:
+          type: string
+  /api/v1/carts/items/{item_id}:
+    delete:
+      summary: DELETE /api/v1/carts/items/{item_id}
+      tags:
+      - api
+      operationId: delete_api_v1_carts_items_item_id
+      responses:
+        '200':
+          description: OK
+      parameters:
+      - name: item_id
+        in: path
+        required: true
+        description: 购物车条目 ID
+        schema:
+          type: string
+  /users:
+    get:
+      summary: GET /users
+      tags:
+      - users
+      operationId: get_users
+      responses:
+        '200':
+          description: OK

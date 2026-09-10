@@ -1,0 +1,22 @@
+[project]
+name = "openapi-agent"
+version = "0.1.0"
+description = "OpenAPI 契约智能生成 Agent（自研状态机流水线，无 Agent 框架）"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "openai>=1.30",
+    "pydantic>=2.5",
+    "python-multipart>=0.0.9",
+    "pyyaml>=6.0",
+    "openapi-spec-validator>=0.7",
+    "deepdiff>=7.0",
+]
+
+[project.optional-dependencies]
+ocr = ["paddleocr>=2.7"]
+dev = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

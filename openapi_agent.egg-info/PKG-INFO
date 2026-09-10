@@ -1,0 +1,17 @@
+Metadata-Version: 2.4
+Name: openapi-agent
+Version: 0.1.0
+Summary: OpenAPI 契约智能生成 Agent（自研状态机流水线，无 Agent 框架）
+Requires-Python: >=3.10
+Requires-Dist: fastapi>=0.110
+Requires-Dist: uvicorn[standard]>=0.29
+Requires-Dist: openai>=1.30
+Requires-Dist: pydantic>=2.5
+Requires-Dist: python-multipart>=0.0.9
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: openapi-spec-validator>=0.7
+Requires-Dist: deepdiff>=7.0
+Provides-Extra: ocr
+Requires-Dist: paddleocr>=2.7; extra == "ocr"
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"
