@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# 构建产物
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# 虚拟环境
+.venv/
+venv/
+env/
+
+# 测试与覆盖率
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# IDE / 编辑器
+.idea/
+.vscode/
+*.iml
+*.swp
+
+# 本地配置与密钥（切勿提交）
+.env
+.env.*
+!.env.example
+
+# 操作系统
+.DS_Store
+Thumbs.db

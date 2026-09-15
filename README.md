@@ -5,6 +5,7 @@
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![fastapi](https://img.shields.io/badge/FastAPI-0.110%2B-009688)
 ![openapi](https://img.shields.io/badge/OpenAPI-3.0.3-6BA539)
+![license](https://img.shields.io/badge/license-MIT-green)
 
 > **当前状态**：可用原型（MVP）。15 个测试全部通过，核心链路无 Agent 框架依赖。已知限制见文末[已知限制](#已知限制)。
 
@@ -28,7 +29,7 @@
 
 | 能力 | 说明 |
 |---|---|
-| **34 种格式统一解析** | 文本类 8 种、源码 16 种、SQL、YAML/JSON、图片（OCR）、zip 递归解包 |
+| **支持 34 种格式输入** | 文本类 8 种、源码 16 种（按纯文本读取后交由 LLM 抽取，非语言级解析）、SQL、YAML/JSON、图片（OCR）、zip 递归解包 |
 | **两阶段 LLM 抽取** | 逐块抽取 → 按 `(path, method)` 分组融合；内容一致的分组本地去重，不发多余请求 |
 | **多源来源打标** | 每段素材标记 `curl` / `code` / `sql` / `markdown` / `testcase`，作为冲突仲裁的优先级依据 |
 | **风险报告** | 显式输出三类问题：信息缺失、字段冲突、AI 推断 |
@@ -90,9 +91,13 @@ openapi-agent/
 │   └── reporting/risk_report.py # 三类风险报告
 ├── tests/                       # 15 个用例，含 Fake LLM，无需真实模型调用
 ├── examples/sample_接口文档.md   # 故意做「脏」的演示素材
-├── openapi.yaml / res.json      # 一次真实运行的产物快照
-├── parse.py.txt                 # 从 res.json 还原 YAML 并打印风险报告的小脚本
-└── pyproject.toml
+├── scripts/
+│   ├── rerun_sample.py          # 用该素材真实跑一次，覆盖下面的产物快照
+│   └── render_result.py         # 从 res.json 还原 YAML 并打印风险报告
+├── openapi.yaml / res.json      # 由 scripts/rerun_sample.py 生成的产物快照
+├── pyproject.toml
+├── .gitignore
+└── LICENSE
 ```
 
 ## 快速开始
@@ -268,6 +273,12 @@ curl -X POST http://127.0.0.1:8000/api/v1/openapi/task/<task_id>/cancel
 
 以 `examples/sample_接口文档.md` 为输入（该素材**故意**混合了文档表格、curl 抓包、源码注释，并预埋了字段冲突、默认值不一致和一个需过滤的内部调试接口），一次真实运行的产物如下。
 
+该快照可用下面这条命令一键复现（需要真实模型调用，会覆盖根目录的 `res.json` 与 `openapi.yaml`）：
+
+```bash
+python scripts/rerun_sample.py
+```
+
 生成的契约（节选）：
 
 ```yaml
@@ -338,6 +349,9 @@ paths:
 
 共 34 种。单个素材解析失败会被记录 warning 并**跳过**，只有全部素材都无效时才返回 `10003`。文本块小于 20 字符会被丢弃。
 
+> 源码类文件只做「按纯文本读取 → 交给 LLM 抽取」，不做 AST / 框架级解析，因此新增语言只需往 `CODE_EXTS` 里加扩展名。
+> OCR 链路基于 PaddleOCR 2.x 的 API，3.x 已移除相关参数，故依赖锁在 `<3.0`；该链路目前**未被单测覆盖**。
+
 ## 可靠性设计
 
 LLM 的输出天然不确定，因此流水线的设计原则是：**产出永远给，问题全部显式标注。**
@@ -378,7 +392,7 @@ python -m pytest -q
 5. **任务数据存在进程内存**：服务重启即丢失，无 TTL 清理，无法多实例部署。
 6. **切块重叠未完全生效**：`recursive_split` 的 `overlap` 参数仅在没有分隔符的兜底分支生效。
 7. **上传无大小与数量限制**：同名文件会在临时目录相互覆盖。
-8. **OCR 为可选依赖**：未安装 `paddleocr` 时，图片素材会被跳过。
+8. **OCR 为可选依赖且未经验证**：未安装 `paddleocr` 时，图片素材会被跳过；实现基于 PaddleOCR 2.x 的 API，因此依赖锁在 `<3.0`，该链路也未被单测覆盖。
 
 ### 后续规划
 
@@ -390,4 +404,4 @@ python -m pytest -q
 
 ## 许可证
 
-本项目暂未添加开源许可证（仓库中无 `LICENSE` 文件）。如需对外分发，建议补充 MIT 或 Apache-2.0。
+本项目基于 [MIT License](LICENSE) 开源。

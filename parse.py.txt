@@ -1,6 +1,0 @@
-import sys,json
-
-d = json.load(open("res.json","r",encoding="utf-8"))
-open('openapi.yaml','w',encoding='utf-8').write(d['openapi'])
-print('风险报告：',json.dumps(d['risk_report'],ensure_ascii=False,indent=2))
-print('diff：',d['diff'])
