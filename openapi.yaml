@@ -2,12 +2,17 @@ openapi: 3.0.3
 info:
   title: Generated API
   version: 1.0.0
+tags:
+- name: 商品订单购物车
+  description: 商品浏览、订单创建与查询、购物车管理相关接口
+- name: 用户管理
+  description: 用户信息相关接口
 paths:
   /api/v1/products:
     get:
-      summary: GET /api/v1/products
+      summary: 查询文件列表
       tags:
-      - api
+      - 商品订单购物车
       operationId: get_api_v1_products
       responses:
         '200':
@@ -33,9 +38,9 @@ paths:
           type: integer
   /api/v1/products/{id}:
     get:
-      summary: GET /api/v1/products/{id}
+      summary: 查询商品详情
       tags:
-      - api
+      - 商品订单购物车
       operationId: get_api_v1_products_id
       responses:
         '200':
@@ -49,9 +54,9 @@ paths:
           type: string
   /api/v1/orders:
     post:
-      summary: POST /api/v1/orders
+      summary: 创建订单
       tags:
-      - api
+      - 商品订单购物车
       operationId: post_api_v1_orders
       responses:
         '200':
@@ -76,9 +81,9 @@ paths:
                   type: string
                   description: AI推断/curl样例字段，文档未列出；出现在抓包样例中
     get:
-      summary: GET /api/v1/orders
+      summary: 查询订单列表
       tags:
-      - api
+      - 商品订单购物车
       operationId: get_api_v1_orders
       responses:
         '200':
@@ -104,9 +109,9 @@ paths:
           type: integer
   /api/v1/orders/{order_id}:
     get:
-      summary: GET /api/v1/orders/{order_id}
+      summary: 查询订单详情
       tags:
-      - api
+      - 商品订单购物车
       operationId: get_api_v1_orders_order_id
       responses:
         '200':
@@ -120,9 +125,9 @@ paths:
           type: string
   /api/v1/carts/items/{item_id}:
     delete:
-      summary: DELETE /api/v1/carts/items/{item_id}
+      summary: 删除购物车商品
       tags:
-      - api
+      - 商品订单购物车
       operationId: delete_api_v1_carts_items_item_id
       responses:
         '200':
@@ -136,9 +141,9 @@ paths:
           type: string
   /users:
     get:
-      summary: GET /users
+      summary: 查询用户列表
       tags:
-      - users
+      - 用户管理
       operationId: get_users
       responses:
         '200':

@@ -1,7 +1,7 @@
-from app.agent.extractor import MetaExtractor
-from app.agent.workflow import AgentWorkflow
-from app.core.errors import BusinessException, ErrorCode
-from app.preprocessing.preprocessor import MaterialPreprocessor
+from openapi_agent.material.extractor import MetaExtractor
+from openapi_agent.core.agent_workflow import AgentWorkflow
+from openapi_agent.core.errors import BusinessException, ErrorCode
+from openapi_agent.material.preprocessor import MaterialPreprocessor
 from tests.fakes import FakeLlmClient
 
 RISK_EMPTY = {"missing_info": [], "conflict_items": [], "ai_infer_items": []}
@@ -108,6 +108,30 @@ def test_multi_source_fusion_marks_conflict():
     assert "markdown" in fuse_calls[0]["user"]
     assert "过滤调试接口" in fuse_calls[0]["user"]
     assert result["risk_report"]["conflict_items"][0]["path"] == "/pets"
+
+
+def test_source_label_is_passed_to_extraction_prompt():
+    """preprocessor 的确定性来源标签必须进入提取 Prompt，不能只靠模型猜。"""
+    for expected_type, payload in (
+        ("sql", {"path": "/u", "method": "GET", "source_type": "sql"}),
+        ("code", {"path": "/u", "method": "GET", "source_type": "code"}),
+    ):
+        llm = FakeLlmClient(defaults={"ExtractionResult": {"endpoints": [payload]}})
+        extractor = MetaExtractor()
+        metas = extractor.extract(
+            llm,
+            chunks=[
+                {
+                    "content": "接口定义片段：GET /u，返回用户集合，字段说明见素材。",
+                    "source_file": f"demo.{expected_type}",
+                    "source_type": expected_type,
+                }
+            ],
+        )
+        prompt = llm.calls[0]["user"]
+        assert expected_type in prompt
+        assert f"demo.{expected_type}" in prompt
+        assert metas[0].source == expected_type
 
 
 def test_extraction_failure_skips_chunk():

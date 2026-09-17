@@ -3,8 +3,8 @@ import time
 import yaml
 from fastapi.testclient import TestClient
 
-import app.api.routes as routes
-from app.main import app
+import openapi_agent.api.routes as routes
+from openapi_agent.main import app
 from tests.fakes import FakeLlmClient
 
 
@@ -39,10 +39,13 @@ def test_generate_poll_result(monkeypatch):
     with TestClient(app) as client:
         r = client.post(
             "/api/v1/openapi/generate",
-            data={"texts": ["获取用户列表接口：GET /users，查询参数 page 整数，分页返回用户数据。"]},
+            data={"text_materials": ["获取用户列表接口：GET /users，查询参数 page 整数，分页返回用户数据。"]},
         )
         assert r.status_code == 200
+        assert r.json()["status"] == "pending"
+        assert "msg" in r.json()
         tid = r.json()["task_id"]
+        assert tid.startswith("task-")
 
         body = _wait_terminal(client, tid)
         assert body["status"] == "completed"
@@ -71,7 +74,7 @@ def test_generate_json_format_result(monkeypatch):
     with TestClient(app) as client:
         tid = client.post(
             "/api/v1/openapi/generate",
-            data={"texts": ["获取资源列表接口：GET /p，直接返回资源集合，无查询参数，便于测试。"], "output_format": "json"},
+            data={"text_materials": ["获取资源列表接口：GET /p，直接返回资源集合，无查询参数，便于测试。"], "output_format": "json"},
         ).json()["task_id"]
         _wait_terminal(client, tid)
         payload = client.get(f"/api/v1/openapi/task/{tid}/result").json()
@@ -85,7 +88,7 @@ def test_cancel_running_task(monkeypatch):
     with TestClient(app) as client:
         tid = client.post(
             "/api/v1/openapi/generate",
-            data={"texts": ["这是一个足够长的测试文本，用来触发一次可被取消的异步生成任务流程验证。"]},
+            data={"text_materials": ["这是一个足够长的测试文本，用来触发一次可被取消的异步生成任务流程验证。"]},
         ).json()["task_id"]
 
         time.sleep(0.3)
@@ -98,3 +101,5 @@ def test_cancel_running_task(monkeypatch):
         r = client.get(f"/api/v1/openapi/task/{tid}/result")
         assert r.status_code == 400
         assert r.json()["code"] == 10001
+        # 设计文档 2.6.1：统一错误响应体字段名为 msg
+        assert "msg" in r.json()

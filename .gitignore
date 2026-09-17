@@ -24,6 +24,9 @@ htmlcov/
 .mypy_cache/
 .ruff_cache/
 
+# 上传素材临时目录（OPENAPI_AGENT_TEMP_ROOT 默认指向系统临时目录）
+.tmp/
+
 # IDE / 编辑器
 .idea/
 .vscode/

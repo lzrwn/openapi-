@@ -5,6 +5,7 @@
     OPENAPI_AGENT_BASE_URL   例如 https://api.openai.com/v1
     OPENAPI_AGENT_API_KEY
     OPENAPI_AGENT_MODEL      可选，默认 gpt-4o-mini
+    OPENAPI_AGENT_TEMP_ROOT  可选，上传素材的临时目录根路径（沙箱/容器环境建议设置）
 
 用法：
     python scripts/rerun_sample.py
@@ -25,7 +26,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from fastapi.testclient import TestClient  # noqa: E402
 
-from app.main import app  # noqa: E402
+from openapi_agent.main import app  # noqa: E402
 from render_result import render  # noqa: E402
 
 TIMEOUT_SECONDS = 300.0
@@ -68,7 +69,12 @@ def main() -> int:
             resp = client.post(
                 "/api/v1/openapi/generate",
                 files=[("files", (sample.name, fh, "text/markdown"))],
-                data={"output_format": "yaml", "title": "Generated API", "version": "1.0.0"},
+                data={
+                    "output_format": "yaml",
+                    "generate_mode": "fast",
+                    "title": "Generated API",
+                    "version": "1.0.0",
+                },
             )
         if resp.status_code != 200:
             raise SystemExit(f"提交任务失败 {resp.status_code}: {resp.text}")
